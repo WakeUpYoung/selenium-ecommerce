@@ -5,6 +5,8 @@ import cn.wakeupeidolon.selenium.handler.SeleniumHandler;
 import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
@@ -14,9 +16,11 @@ import java.util.List;
  */
 public class TaobaoHandler implements SeleniumHandler<String, Integer> {
     
+    private static final Logger LOG = LoggerFactory.getLogger(TaobaoHandler.class);
+    
     @Override
     public Integer apply(String url) {
-        WebDriver driver = SeleniumFactory.create(url, false, TmallLogin.getCookiesFromFile()).driver();
+        WebDriver driver = SeleniumFactory.create(url, false).driver();
         TmallLogin.login(driver);
         WebElement goodsName;
         try{
@@ -26,15 +30,12 @@ public class TaobaoHandler implements SeleniumHandler<String, Integer> {
             goodsName = driver.findElement(By.cssSelector("#J_DetailMeta > div.tm-clear > div.tb-property > div > div.tb-detail-hd > h1"));
         }
         System.out.println("商品名: " + goodsName.getText());
-        // 评论头
-        // WebElement reviewsTitle = driver.findElement(By.cssSelector("#J_Reviews > h4"));
     
         // 可点击的评论标签
         WebElement reviewsLi = driver.findElement(By.cssSelector("#J_ItemRates"));
         reviewsLi.click();
+        // 滚动脚本
         String scrollScript = "arguments[0].scrollIntoView(false);";
-        // 滚动到评论头位置
-        // ((JavascriptExecutor) driver).executeScript(scrollScript, reviewsTitle);
         // 评论总数
         WebElement totalComment = new WebDriverWait(driver, 5)
                 .until((d) -> {

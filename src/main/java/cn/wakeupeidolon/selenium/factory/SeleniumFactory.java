@@ -23,7 +23,7 @@ public class SeleniumFactory {
      * @param url url
      * @param disableGpu 是否禁止GPU
      */
-    public static SeleniumFactory create(String url, boolean disableGpu, Set<Cookie> cookies){
+    public static SeleniumFactory create(String url, boolean disableGpu){
         System.setProperty("webdriver.chrome.driver", "C:\\Users\\Ste\\AppData\\Local\\Google\\Chrome\\Application\\chromedriver.exe");
         ChromeOptions options = new ChromeOptions();
         options.addArguments("disable-infobars",
@@ -34,30 +34,28 @@ public class SeleniumFactory {
         WebDriver driver = new ChromeDriver(options);
         driver.manage().window().maximize();
         driver.get(url);
-        if (cookies != null || cookies.size() > 0){
-            for (Cookie cookie : cookies){
-                driver.manage().addCookie(cookie);
-            }
-            driver.navigate().refresh();
-        }
-    
         SeleniumFactory seleniumFactory = new SeleniumFactory();
         SeleniumInstance instance = seleniumFactory.new SeleniumInstance();
         seleniumFactory.seleniumInstance = instance;
         
-        instance.driver = driver;
+        instance.setDriver(driver);
         return seleniumFactory;
     }
     
     public WebDriver driver(){
-        return this.seleniumInstance.driver;
+        return this.seleniumInstance.getDriver();
     }
     
     private class SeleniumInstance{
-        
         private WebDriver driver;
-        
-        
+    
+        WebDriver getDriver() {
+            return driver;
+        }
+    
+        void setDriver(WebDriver driver) {
+            this.driver = driver;
+        }
     }
     
 }

@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.Set;
-import java.util.regex.Pattern;
 
 /**
  * @author Wang Yu
@@ -39,16 +38,39 @@ public class TmallLogin {
             loginSccSelector = "#login-info > a.sn-login";
             userNameTag = "#login-info > span:nth-child(1) > a.j_Username.j_UserNick.sn-user-nick";
         }
-        WebElement loginLink = driver.findElement(By.cssSelector(loginSccSelector));
-        loginLink.click();
+        // 先从文件中读取Cookies
+        Set<Cookie> cookies = getCookiesFromFile();
+        if (cookies != null && cookies.size() > 0){
+            for (Cookie cookie : cookies){
+                driver.manage().addCookie(cookie);
+            }
+            try {
+                Thread.sleep(5000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            driver.navigate().refresh();
+        }
         try{
             // 等待登录成功
-            WebElement userName = new WebDriverWait(driver, 60)
+            WebElement userName = new WebDriverWait(driver, 30)
                     .until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(userNameTag)));
             LOG.info("用户: " + userName.getText() + "登录成功");
     
-        }catch (NoSuchElementException e){
-            return false;
+        }catch (NoSuchElementException | TimeoutException e){
+            // 开始人工登录
+            WebElement loginLink = driver.findElement(By.cssSelector(loginSccSelector));
+            loginLink.click();
+            
+            try{
+                WebElement userName = new WebDriverWait(driver, 60)
+                        .until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(userNameTag)));
+                LOG.info("用户: " + userName.getText() + "登录成功");
+                // 人工登录成功后，保存当前Cookies
+                saveCookies(getCookies(driver));
+            }catch (NoSuchElementException noSuchEcp){
+                return false;
+            }
         }
         return true;
     }
@@ -87,16 +109,20 @@ public class TmallLogin {
         }
     }
     
+    @SuppressWarnings("unchecked")
     public static Set<Cookie> getCookiesFromFile(){
         Set<Cookie> cookies = null;
+        File cookiesFile = new File("cookies.obj");
+        if (!cookiesFile.exists()){
+            return null;
+        }
         try {
-            ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream("cookies.obj"));
+            ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream(cookiesFile));
             cookies = (Set<Cookie>) objectInputStream.readObject();
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
         return cookies;
     }
-    
     
 }
