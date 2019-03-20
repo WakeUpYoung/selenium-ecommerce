@@ -13,6 +13,7 @@ import java.util.List;
 
 /**
  * @author Wang Yu
+ * 登录后处理爬取逻辑
  */
 public class TaobaoHandler implements SeleniumHandler<String, Integer> {
     

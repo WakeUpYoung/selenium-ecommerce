@@ -1,29 +1,62 @@
 package cn.wakeupeidolon.selenium.handler.taobao;
 
+import cn.wakeupeidolon.entity.taobao.RateDetail;
+import cn.wakeupeidolon.entity.taobao.RateList;
+import cn.wakeupeidolon.entity.taobao.TaobaoBean;
+import com.alibaba.fastjson.JSONObject;
+import com.sun.istack.internal.NotNull;
 import okhttp3.*;
+import okhttp3.internal.annotations.EverythingIsNonNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.io.IOException;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
  * @author Wang Yu
+ * 使用HTTP发送请求，获取json
  */
 public class TmallHttp {
     
+    private static final Logger LOG = LoggerFactory.getLogger(TmallHttp.class);
+    
     public static void get(String url) {
         String userAgent = "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36";
+    
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
                 .readTimeout(30L, TimeUnit.SECONDS)
                 .cookieJar(new CookieJar(){
                     @Override
-                    public void saveFromResponse(HttpUrl httpUrl, List<Cookie> list) {
-        
+                    public void saveFromResponse(@Nonnull HttpUrl httpUrl, @Nonnull List<Cookie> list) {
+                    
                     }
     
                     @Override
-                    public List<Cookie> loadForRequest(HttpUrl httpUrl) {
-                        return null;
+                    public List<Cookie> loadForRequest(@Nonnull HttpUrl httpUrl) {
+                        LOG.info("使用Cookies请求");
+                        Set<org.openqa.selenium.Cookie> cookiesFile = TmallLogin.getCookiesFromFile();
+                        List<Cookie> cookies = new ArrayList<>();
+                        if (cookiesFile == null){
+                            return null;
+                        }
+                        cookiesFile.forEach(cookie -> {
+                            String domain = cookie.getDomain();
+                            if (domain.startsWith(".")){
+                                domain = domain.substring(1);
+                            }
+                            Cookie httpCookie = new Cookie.Builder()
+                                    .name(cookie.getName())
+                                    .value(cookie.getValue())
+                                    .hostOnlyDomain(domain)
+                                    .path(cookie.getPath())
+                                    .build();
+                            cookies.add(httpCookie);
+                        });
+                        return cookies;
                     }
                 })
                 .build();
@@ -45,6 +78,17 @@ public class TmallHttp {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        System.out.println(stringBuilder.toString());
+        String bodyReqStr = stringBuilder.toString();
+        String jsonStr = bodyReqStr.substring(bodyReqStr.indexOf("(") + 1, bodyReqStr.lastIndexOf(")"));
+        TaobaoBean taobaoBean = JSONObject.parseObject(jsonStr, TaobaoBean.class);
+        RateDetail rateDetail = taobaoBean.getRateDetail();
+        List<RateList> rateList = rateDetail.getRateList();
+        rateList.forEach(rate -> {
+            System.out.println("评论内容：" + rate.getRateContent());
+            if (rate.getAppendComment() != null && !rate.getAppendComment().equals("")){
+                System.out.println("追加内容：" + rate.getAppendComment());
+    
+            }
+        });
     }
 }

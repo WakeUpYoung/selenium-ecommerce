@@ -1,5 +1,6 @@
 package cn.wakeupeidolon.selenium.handler.taobao;
 
+import cn.wakeupeidolon.exceptions.CannotLoginException;
 import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -55,9 +56,12 @@ public class TmallLogin {
             // 等待登录成功
             WebElement userName = new WebDriverWait(driver, 30)
                     .until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(userNameTag)));
+            if (userName.getText() == null || userName.getText().equals("")){
+                throw new CannotLoginException("登录未成功");
+            }
             LOG.info("用户: " + userName.getText() + "登录成功");
     
-        }catch (NoSuchElementException | TimeoutException e){
+        }catch (NoSuchElementException | TimeoutException | CannotLoginException e){
             // 开始人工登录
             WebElement loginLink = driver.findElement(By.cssSelector(loginSccSelector));
             loginLink.click();

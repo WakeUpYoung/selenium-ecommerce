@@ -45,9 +45,9 @@ public class RateDetail {
     
     @Override
     public String toString() {
-        return "rateList=" + rateList
-                + "\n" + "searchinfo=" + searchinfo + "\n"
-                + "from=" + from + "\n"
-                + "tags=" + String.join(",", tags);
+        return "rateList = " + rateList
+                + "\n" + "searchinfo = " + searchinfo + "\n"
+                + "from = " + from + "\n"
+                + "tags = " + String.join(",", tags);
     }
 }
