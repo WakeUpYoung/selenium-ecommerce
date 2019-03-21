@@ -4,27 +4,40 @@ import cn.wakeupeidolon.entity.taobao.RateDetail;
 import cn.wakeupeidolon.entity.taobao.RateList;
 import cn.wakeupeidolon.entity.taobao.TaobaoBean;
 import com.alibaba.fastjson.JSONObject;
-import com.sun.istack.internal.NotNull;
 import okhttp3.*;
-import okhttp3.internal.annotations.EverythingIsNonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
  * @author Wang Yu
- * 使用HTTP发送请求，获取json
+ * 使用HTTP发送请求，获取json结构的评论数据
  */
 public class TmallHttp {
     
     private static final Logger LOG = LoggerFactory.getLogger(TmallHttp.class);
     
-    public static void get(String url) {
+    private static final String TMALL_URL = "https://rate.tmall.com/list_detail_rate.htm";
+    
+    /**
+     * 创建淘宝评论Url
+     * @param itemId 商品ID
+     * @param page 第几页
+     */
+    public static String createUrl(String itemId, int page){
+        return TMALL_URL + "?itemId=" + itemId + "&sellerId=1758984938&order=3&currentPage=" + page + "&tdsourcetag=s_pctim_aiomsg";
+    }
+    
+    /**
+     * 通过HTTP请求获取数据，使用Cookies
+     * @param url 商品页面的url
+     * @return {@link RateDetail} 评论详情
+     */
+    public static RateDetail get(String url) {
         String userAgent = "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36";
     
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
@@ -81,14 +94,7 @@ public class TmallHttp {
         String bodyReqStr = stringBuilder.toString();
         String jsonStr = bodyReqStr.substring(bodyReqStr.indexOf("(") + 1, bodyReqStr.lastIndexOf(")"));
         TaobaoBean taobaoBean = JSONObject.parseObject(jsonStr, TaobaoBean.class);
-        RateDetail rateDetail = taobaoBean.getRateDetail();
-        List<RateList> rateList = rateDetail.getRateList();
-        rateList.forEach(rate -> {
-            System.out.println("评论内容：" + rate.getRateContent());
-            if (rate.getAppendComment() != null && !rate.getAppendComment().equals("")){
-                System.out.println("追加内容：" + rate.getAppendComment());
-    
-            }
-        });
+        return taobaoBean.getRateDetail();
+        
     }
 }

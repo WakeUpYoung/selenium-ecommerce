@@ -15,41 +15,19 @@ import java.util.List;
  * @author Wang Yu
  * 登录后处理爬取逻辑
  */
-public class TaobaoHandler implements SeleniumHandler<String, Integer> {
+public class TaobaoSeleniumHandler implements SeleniumHandler<String, Integer> {
     
-    private static final Logger LOG = LoggerFactory.getLogger(TaobaoHandler.class);
+    private static final Logger LOG = LoggerFactory.getLogger(TaobaoSeleniumHandler.class);
     
     @Override
     public Integer apply(String url) {
-        WebDriver driver = SeleniumFactory.create(url, false).driver();
+        SeleniumFactory seleniumFactory = SeleniumFactory.create(url, false);
+        WebDriver driver = seleniumFactory.driver();
+        // 登录
         TmallLogin.login(driver);
-        WebElement goodsName;
-        try{
-            goodsName = driver.findElement(By.cssSelector("#J_DetailMeta > div.tm-clear > div.tb-property > div > div.tb-detail-hd > h1 > a"));
-        
-        }catch (NoSuchElementException e){
-            goodsName = driver.findElement(By.cssSelector("#J_DetailMeta > div.tm-clear > div.tb-property > div > div.tb-detail-hd > h1"));
-        }
-        System.out.println("商品名: " + goodsName.getText());
-    
-        // 可点击的评论标签
-        WebElement reviewsLi = driver.findElement(By.cssSelector("#J_ItemRates"));
-        reviewsLi.click();
-        // 滚动脚本
+        // 获取基本数据
+        TaobaoCommon.getCommonData(driver);
         String scrollScript = "arguments[0].scrollIntoView(false);";
-        // 评论总数
-        WebElement totalComment = new WebDriverWait(driver, 5)
-                .until((d) -> {
-                    return d.findElement(By.cssSelector("#J_TabBar > li.tm-selected > a > em"));
-                });
-        System.out.println("总评论数: " + totalComment.getText());
-        // 商品评分
-        WebElement commodityRate = new WebDriverWait(driver, 15)
-                .until((d) -> {
-                    return d.findElement(By.cssSelector("#J_Reviews > div > div.rate-header.rate-header-tags > div.rate-score > strong"));
-                });
-        System.out.println("商品评分 : " + Double.valueOf(commodityRate.getText()));
-    
         int count = 1;
         int maxCount = 5;
         int totalSpider = 0;

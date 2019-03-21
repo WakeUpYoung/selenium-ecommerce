@@ -17,11 +17,11 @@ import java.util.Set;
 public class TmallLogin {
     
     // 淘宝
-    private static final int TAO_BAO = 0;
+    public static final int TAO_BAO = 0;
     // 天猫
-    private static final int TMALL = 1;
+    public static final int TMALL = 1;
     
-    private static final int UNKNOWN = 2;
+    public static final int UNKNOWN = 2;
     
     private static final Logger LOG = LoggerFactory.getLogger(TmallLogin.class);
     
@@ -62,6 +62,7 @@ public class TmallLogin {
             LOG.info("用户: " + userName.getText() + "登录成功");
     
         }catch (NoSuchElementException | TimeoutException | CannotLoginException e){
+            LOG.info("自动登录失败，开始人工登录");
             // 开始人工登录
             WebElement loginLink = driver.findElement(By.cssSelector(loginSccSelector));
             loginLink.click();

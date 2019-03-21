@@ -9,7 +9,6 @@ public class RateDetail {
     private List<RateList> rateList;
     private String searchinfo;
     private String from;
-    private List<String> tags;
     
     public List<RateList> getRateList() {
         return rateList;
@@ -35,19 +34,11 @@ public class RateDetail {
         this.from = from;
     }
     
-    public List<String> getTags() {
-        return tags;
-    }
-    
-    public void setTags(List<String> tags) {
-        this.tags = tags;
-    }
     
     @Override
     public String toString() {
-        return "rateList = " + rateList
+        return "rateList.size = " + rateList.size()
                 + "\n" + "searchinfo = " + searchinfo + "\n"
-                + "from = " + from + "\n"
-                + "tags = " + String.join(",", tags);
+                + "from = " + from + "\n";
     }
 }

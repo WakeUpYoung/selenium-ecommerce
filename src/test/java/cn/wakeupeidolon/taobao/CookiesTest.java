@@ -1,5 +1,6 @@
 package cn.wakeupeidolon.taobao;
 
+import cn.wakeupeidolon.entity.taobao.RateDetail;
 import cn.wakeupeidolon.selenium.factory.SeleniumFactory;
 import cn.wakeupeidolon.selenium.handler.taobao.TmallHttp;
 import cn.wakeupeidolon.selenium.handler.taobao.TmallLogin;
@@ -61,7 +62,7 @@ public class CookiesTest {
     
     @Test
     public void okHttpTest(){
-        TmallHttp.get("https://rate.tmall.com/list_detail_rate.htm?itemId=587578411300&sellerId=1758984938&order=3&currentPage=1&tdsourcetag=s_pctim_aiomsg");
+        TmallHttp.get("https://rate.tmall.com/list_detail_rate.htm?itemId=587578411300&sellerId=1758984938&order=3&currentPage=1&tdsourcetag=s_pctim_aiomsg")
     }
     
     

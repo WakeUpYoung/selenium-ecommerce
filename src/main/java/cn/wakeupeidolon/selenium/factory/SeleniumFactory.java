@@ -19,9 +19,10 @@ public class SeleniumFactory {
     }
     
     /**
-     *
+     * 创建Selenium对象
      * @param url url
      * @param disableGpu 是否禁止GPU
+     * @return WebDriver
      */
     public static SeleniumFactory create(String url, boolean disableGpu){
         System.setProperty("webdriver.chrome.driver", "C:\\Users\\Ste\\AppData\\Local\\Google\\Chrome\\Application\\chromedriver.exe");
