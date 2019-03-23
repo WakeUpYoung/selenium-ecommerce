@@ -24,7 +24,13 @@ public class TaobaoSeleniumHandler implements SeleniumHandler<String, Integer> {
         SeleniumFactory seleniumFactory = SeleniumFactory.create(url, false);
         WebDriver driver = seleniumFactory.driver();
         // 登录
-        TmallLogin.login(driver);
+        try {
+            TmallLogin.login(driver);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+            driver.quit();
+            return -1;
+        }
         // 获取基本数据
         TaobaoCommon.getCommonData(driver);
         String scrollScript = "arguments[0].scrollIntoView(false);";

@@ -6,7 +6,7 @@ package cn.wakeupeidolon.exceptions;
  */
 public class CannotLoginException extends RuntimeException {
     public CannotLoginException() {
-        super();
+        super("无法登录");
     }
     
     public CannotLoginException(String message) {

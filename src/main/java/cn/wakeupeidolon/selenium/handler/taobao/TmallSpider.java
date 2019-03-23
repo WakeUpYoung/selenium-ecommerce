@@ -32,7 +32,12 @@ public class TmallSpider implements SeleniumHandler<String, List<RateList>> {
         SeleniumFactory seleniumFactory = SeleniumFactory.create(url, false);
         WebDriver driver = seleniumFactory.driver();
         // 登录
-        TmallLogin.login(driver);
+        try {
+            TmallLogin.login(driver);
+        } catch (IllegalAccessException e) {
+            driver.quit();
+            return null;
+        }
         // 获取基本数据
         TaobaoCommon.getCommonData(driver);
         String currentUrl = driver.getCurrentUrl();

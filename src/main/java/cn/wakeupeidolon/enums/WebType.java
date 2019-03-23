@@ -8,7 +8,8 @@ package cn.wakeupeidolon.enums;
 public enum WebType {
     TAO_BAO(0), // 淘宝
     TMALL(1),  // 天猫
-    JD(2)  // 京东
+    JD(2),  // 京东
+    UNKNOWN(-1)
     ;
     private int type;
     

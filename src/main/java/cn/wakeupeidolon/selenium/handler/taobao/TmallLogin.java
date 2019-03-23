@@ -1,5 +1,6 @@
 package cn.wakeupeidolon.selenium.handler.taobao;
 
+import cn.wakeupeidolon.enums.WebType;
 import cn.wakeupeidolon.exceptions.CannotLoginException;
 import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -16,28 +17,25 @@ import java.util.Set;
  */
 public class TmallLogin {
     
-    // 淘宝
-    public static final int TAO_BAO = 0;
-    // 天猫
-    public static final int TMALL = 1;
-    
-    public static final int UNKNOWN = 2;
-    
     private static final Logger LOG = LoggerFactory.getLogger(TmallLogin.class);
     
-    public static boolean login(WebDriver driver){
+    public static boolean login(WebDriver driver) throws IllegalAccessException{
         String currentUrl = driver.getCurrentUrl();
         String loginSccSelector = "";
         String userNameTag = "";
         // 商品是淘宝的
-        if (taoBaoOrTmall(currentUrl) == TAO_BAO){
+        if (taoBaoOrTmall(currentUrl) == WebType.TAO_BAO.getType()){
             loginSccSelector = "#J_SiteNavLogin > div.site-nav-menu-hd > div.site-nav-sign > a.h";
             userNameTag = "#J_SiteNavLogin > div.site-nav-menu-hd > div.site-nav-user > a.site-nav-login-info-nick";
         }
         // 商品是天猫的
-        if (taoBaoOrTmall(currentUrl) == TMALL){
+        if (taoBaoOrTmall(currentUrl) == WebType.TMALL.getType()){
             loginSccSelector = "#login-info > a.sn-login";
             userNameTag = "#login-info > span:nth-child(1) > a.j_Username.j_UserNick.sn-user-nick";
+        }
+        if (taoBaoOrTmall(currentUrl) == WebType.UNKNOWN.getType()){
+            LOG.error("url非法:不是天猫或淘宝链接");
+            throw new IllegalAccessException("url非法:不是天猫或淘宝链接");
         }
         // 先从文件中读取Cookies
         Set<Cookie> cookies = getCookiesFromFile();
@@ -83,16 +81,16 @@ public class TmallLogin {
     /**
      * 判断当前商品是天猫商品还是淘宝商品
      */
-    private static int taoBaoOrTmall(String currentUrl){
+    public static int taoBaoOrTmall(String currentUrl){
         // 商品是淘宝的
         if (currentUrl.startsWith("https://item.taobao.com")){
-            return TAO_BAO;
+            return WebType.TAO_BAO.getType();
         }
         // 商品是天猫的
         if (currentUrl.startsWith("https://detail.tmall.com")){
-            return TMALL;
+            return WebType.TMALL.getType();
         }
-        return UNKNOWN;
+        return WebType.UNKNOWN.getType();
     }
     
     public static Set<Cookie> getCookies(WebDriver driver){
