@@ -1,4 +1,4 @@
-package cn.wakeupeidolon.selenium.handler.taobao;
+package cn.wakeupeidolon.selenium.handler.tmall;
 
 import cn.wakeupeidolon.selenium.factory.SeleniumFactory;
 import cn.wakeupeidolon.selenium.handler.SeleniumHandler;
@@ -15,9 +15,9 @@ import java.util.List;
  * @author Wang Yu
  * 登录后处理爬取逻辑
  */
-public class TaobaoSeleniumHandler implements SeleniumHandler<String, Integer> {
+public class TmallSeleniumHandler implements SeleniumHandler<String, Integer> {
     
-    private static final Logger LOG = LoggerFactory.getLogger(TaobaoSeleniumHandler.class);
+    private static final Logger LOG = LoggerFactory.getLogger(TmallSeleniumHandler.class);
     
     @Override
     public Integer apply(String url) {
@@ -32,7 +32,7 @@ public class TaobaoSeleniumHandler implements SeleniumHandler<String, Integer> {
             return -1;
         }
         // 获取基本数据
-        TaobaoCommon.getCommonData(driver);
+        TmallCommon.getCommonData(driver);
         String scrollScript = "arguments[0].scrollIntoView(false);";
         int count = 1;
         int maxCount = 5;

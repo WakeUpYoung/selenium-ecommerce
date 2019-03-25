@@ -1,7 +1,6 @@
-package cn.wakeupeidolon.selenium.handler.taobao;
+package cn.wakeupeidolon.selenium.handler.tmall;
 
 import cn.wakeupeidolon.entity.taobao.RateDetail;
-import cn.wakeupeidolon.entity.taobao.RateList;
 import cn.wakeupeidolon.entity.taobao.TaobaoBean;
 import com.alibaba.fastjson.JSONObject;
 import okhttp3.*;

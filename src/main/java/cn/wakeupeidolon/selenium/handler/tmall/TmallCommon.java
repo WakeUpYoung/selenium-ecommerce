@@ -1,5 +1,6 @@
-package cn.wakeupeidolon.selenium.handler.taobao;
+package cn.wakeupeidolon.selenium.handler.tmall;
 
+import cn.wakeupeidolon.bean.Commodity;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
@@ -8,15 +9,17 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Date;
+
 /**
  * 获取基础数据包括商品名、评论总数、商品评分
  * @author Wang Yu
  */
-public class TaobaoCommon {
+public class TmallCommon {
     
-    private static final Logger LOG = LoggerFactory.getLogger(TaobaoCommon.class);
+    private static final Logger LOG = LoggerFactory.getLogger(TmallCommon.class);
     
-    protected static void getCommonData(WebDriver driver){
+    public static Commodity getCommonData(WebDriver driver){
         WebElement goodsName;
         try{
             goodsName = driver.findElement(By.cssSelector("#J_DetailMeta > div.tm-clear > div.tb-property > div > div.tb-detail-hd > h1 > a"));
@@ -47,5 +50,13 @@ public class TaobaoCommon {
         // 评分
         double rate = Double.valueOf(commodityRate.getText());
         LOG.info("商品名称:" + goodsNameStr + "," + "评论总数:" + totalCommentStr + "," + "商品评分:" + rate + "," + "type:" + type);
+        Commodity commodity = new Commodity();
+        commodity.setTotalComment(Integer.valueOf(totalCommentStr));
+        commodity.setCommodityName(goodsNameStr);
+        commodity.setCommodityRate(rate);
+        commodity.setType(type);
+        commodity.setCreateDate(new Date());
+        return commodity;
+        
     }
 }

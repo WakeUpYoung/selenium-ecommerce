@@ -1,9 +1,9 @@
-package cn.wakeupeidolon.selenium.handler.taobao;
+package cn.wakeupeidolon.selenium.handler.tmall;
 
+import cn.wakeupeidolon.bean.Commodity;
 import cn.wakeupeidolon.entity.taobao.RateDetail;
 import cn.wakeupeidolon.entity.taobao.RateList;
 import cn.wakeupeidolon.selenium.factory.SeleniumFactory;
-import cn.wakeupeidolon.selenium.handler.SeleniumHandler;
 import cn.wakeupeidolon.utils.UrlUtils;
 import com.alibaba.fastjson.JSONObject;
 import org.openqa.selenium.WebDriver;
@@ -17,18 +17,20 @@ import java.util.List;
  * @author Wang Yu
  * 对天猫或淘宝网站的评论数据进行爬取
  */
-public class TmallSpider implements SeleniumHandler<String, List<RateList>> {
+public class TmallSpider {
     
     private static final Logger LOG = LoggerFactory.getLogger(TmallSpider.class);
     private static final String EMPTY_COMMENT = "此用户没有填写评论!";
     
+    private List<RateList> rateList;
+    private Commodity commodity;
+    
     /**
      * 获取评论对象集合
      * @param url 商品页面url
-     * @return 商品评论详情对象集合
      */
-    @Override
-    public List<RateList> apply(String url) {
+    public static TmallSpider commentSpider(String url) {
+        
         SeleniumFactory seleniumFactory = SeleniumFactory.create(url, false);
         WebDriver driver = seleniumFactory.driver();
         // 登录
@@ -36,10 +38,9 @@ public class TmallSpider implements SeleniumHandler<String, List<RateList>> {
             TmallLogin.login(driver);
         } catch (IllegalAccessException e) {
             driver.quit();
-            return null;
         }
-        // 获取基本数据
-        TaobaoCommon.getCommonData(driver);
+        // 获取基本信息
+        Commodity commodity = TmallCommon.getCommonData(driver);
         String currentUrl = driver.getCurrentUrl();
         String itemId = UrlUtils.getParam(currentUrl, "id");
         List<RateList> rateList = new ArrayList<>();
@@ -56,6 +57,25 @@ public class TmallSpider implements SeleniumHandler<String, List<RateList>> {
                 rateList.add(rate);
             });
         }
+        TmallSpider tmallSpider = new TmallSpider();
+        tmallSpider.setCommodity(commodity);
+        tmallSpider.setRateList(rateList);
+        return tmallSpider;
+    }
+    
+    public List<RateList> getRateList() {
         return rateList;
+    }
+    
+    public void setRateList(List<RateList> rateList) {
+        this.rateList = rateList;
+    }
+    
+    public Commodity getCommodity() {
+        return commodity;
+    }
+    
+    public void setCommodity(Commodity commodity) {
+        this.commodity = commodity;
     }
 }

@@ -1,4 +1,4 @@
-package cn.wakeupeidolon.selenium.handler.taobao;
+package cn.wakeupeidolon.selenium.handler.tmall;
 
 import cn.wakeupeidolon.enums.WebType;
 import cn.wakeupeidolon.exceptions.CannotLoginException;

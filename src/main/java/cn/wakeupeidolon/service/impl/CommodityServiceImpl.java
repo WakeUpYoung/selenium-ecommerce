@@ -3,6 +3,7 @@ package cn.wakeupeidolon.service.impl;
 import cn.wakeupeidolon.bean.Commodity;
 import cn.wakeupeidolon.dao.CommodityDao;
 import cn.wakeupeidolon.service.CommodityService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,6 +16,7 @@ public class CommodityServiceImpl implements CommodityService {
     
     private final CommodityDao commodityDao;
     
+    @Autowired
     public CommodityServiceImpl(CommodityDao commodityDao) {
         this.commodityDao = commodityDao;
     }

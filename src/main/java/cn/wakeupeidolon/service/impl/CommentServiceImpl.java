@@ -3,6 +3,7 @@ package cn.wakeupeidolon.service.impl;
 import cn.wakeupeidolon.bean.Comment;
 import cn.wakeupeidolon.dao.CommentDao;
 import cn.wakeupeidolon.service.CommentService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,6 +16,7 @@ public class CommentServiceImpl implements CommentService {
     
     private final CommentDao commentDao;
     
+    @Autowired
     public CommentServiceImpl(CommentDao commentDao) {
         this.commentDao = commentDao;
     }

@@ -1,9 +1,8 @@
 package cn.wakeupeidolon.taobao;
 
-import cn.wakeupeidolon.entity.taobao.RateDetail;
 import cn.wakeupeidolon.selenium.factory.SeleniumFactory;
-import cn.wakeupeidolon.selenium.handler.taobao.TmallHttp;
-import cn.wakeupeidolon.selenium.handler.taobao.TmallLogin;
+import cn.wakeupeidolon.selenium.handler.tmall.TmallHttp;
+import cn.wakeupeidolon.selenium.handler.tmall.TmallLogin;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -17,6 +16,7 @@ import java.util.Set;
  * @author Wang Yu
  */
 @RunWith(JUnit4.class)
+@Ignore
 public class CookiesTest {
     @Test
     public void testCookies(){
