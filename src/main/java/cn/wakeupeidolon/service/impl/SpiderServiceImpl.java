@@ -32,10 +32,14 @@ public class SpiderServiceImpl implements SpiderService {
         this.commodityService = commodityService;
     }
     
+    /**
+     * 对天猫或淘宝进行爬取，并保存数据库
+     * @param url 商品所在链接
+     * @return 总共爬取的评论数
+     */
     @Override
     @Transactional
     public Integer spiderTmall(String url) {
-    
         TmallSpider spider = TmallSpider.commentSpider(url);
         Commodity commodity = spider.getCommodity();
         List<RateList> rateList = spider.getRateList();
@@ -47,6 +51,8 @@ public class SpiderServiceImpl implements SpiderService {
             comment.setAppendComment(rate.getAppendComment());
             comment.setCommodityId(save.getId());
             comment.setCreateDate(new Date());
+            comment.setBelievable(0);
+            comment.setFake(0);
             commentList.add(comment);
         });
     

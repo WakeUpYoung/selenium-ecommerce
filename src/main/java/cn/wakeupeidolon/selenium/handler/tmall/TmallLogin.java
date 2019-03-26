@@ -2,6 +2,7 @@ package cn.wakeupeidolon.selenium.handler.tmall;
 
 import cn.wakeupeidolon.enums.WebType;
 import cn.wakeupeidolon.exceptions.CannotLoginException;
+import cn.wakeupeidolon.exceptions.IllegalUrlException;
 import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -19,7 +20,7 @@ public class TmallLogin {
     
     private static final Logger LOG = LoggerFactory.getLogger(TmallLogin.class);
     
-    public static boolean login(WebDriver driver) throws IllegalAccessException{
+    public static boolean login(WebDriver driver) throws IllegalUrlException{
         String currentUrl = driver.getCurrentUrl();
         String loginSccSelector = "";
         String userNameTag = "";
@@ -35,7 +36,7 @@ public class TmallLogin {
         }
         if (taoBaoOrTmall(currentUrl) == WebType.UNKNOWN.getType()){
             LOG.error("url非法:不是天猫或淘宝链接");
-            throw new IllegalAccessException("url非法:不是天猫或淘宝链接");
+            throw new IllegalUrlException("url非法:不是天猫或淘宝链接");
         }
         // 先从文件中读取Cookies
         Set<Cookie> cookies = getCookiesFromFile();

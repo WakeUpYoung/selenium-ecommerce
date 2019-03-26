@@ -1,5 +1,6 @@
 package cn.wakeupeidolon.selenium.handler.tmall;
 
+import cn.wakeupeidolon.exceptions.IllegalUrlException;
 import cn.wakeupeidolon.selenium.factory.SeleniumFactory;
 import cn.wakeupeidolon.selenium.handler.SeleniumHandler;
 import org.openqa.selenium.*;
@@ -26,13 +27,14 @@ public class TmallSeleniumHandler implements SeleniumHandler<String, Integer> {
         // 登录
         try {
             TmallLogin.login(driver);
-        } catch (IllegalAccessException e) {
+        } catch (IllegalUrlException e) {
             e.printStackTrace();
             driver.quit();
             return -1;
         }
         // 获取基本数据
         TmallCommon.getCommonData(driver);
+        // 滚动脚本
         String scrollScript = "arguments[0].scrollIntoView(false);";
         int count = 1;
         int maxCount = 5;

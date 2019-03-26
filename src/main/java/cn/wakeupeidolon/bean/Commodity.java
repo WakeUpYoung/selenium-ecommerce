@@ -1,5 +1,7 @@
 package cn.wakeupeidolon.bean;
 
+import org.hibernate.annotations.DynamicUpdate;
+
 import javax.persistence.*;
 import java.util.Date;
 
@@ -8,6 +10,7 @@ import java.util.Date;
  */
 @Entity
 @Table(name = "tb_commodity")
+@DynamicUpdate
 public class Commodity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,6 +23,9 @@ public class Commodity {
     @Column(name = "commodity_rate")
     private Double commodityRate;
     
+    @Column(name = "favorable_rate")
+    private Double favorableRate;
+    
     @Column(name = "total_comment")
     private Integer totalComment;
     
@@ -31,6 +37,14 @@ public class Commodity {
     
     @Column(name = "update_date")
     private Date updateDate;
+    
+    public Double getFavorableRate() {
+        return favorableRate;
+    }
+    
+    public void setFavorableRate(Double favorableRate) {
+        this.favorableRate = favorableRate;
+    }
     
     public Long getId() {
         return id;

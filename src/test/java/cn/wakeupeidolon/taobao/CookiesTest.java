@@ -1,5 +1,6 @@
 package cn.wakeupeidolon.taobao;
 
+import cn.wakeupeidolon.exceptions.IllegalUrlException;
 import cn.wakeupeidolon.selenium.factory.SeleniumFactory;
 import cn.wakeupeidolon.selenium.handler.tmall.TmallHttp;
 import cn.wakeupeidolon.selenium.handler.tmall.TmallLogin;
@@ -28,7 +29,7 @@ public class CookiesTest {
                 Set<Cookie> cookies = TmallLogin.getCookies(driver);
                 TmallLogin.saveCookies(cookies);
             }
-        } catch (IllegalAccessException e) {
+        } catch (IllegalUrlException e) {
             e.printStackTrace();
         }
         System.out.println("使用Cookies 登录成功");
@@ -63,7 +64,7 @@ public class CookiesTest {
         boolean login = false;
         try {
             login = TmallLogin.login(driver);
-        } catch (IllegalAccessException e) {
+        } catch (IllegalUrlException e) {
             e.printStackTrace();
         }
         System.out.println(login);

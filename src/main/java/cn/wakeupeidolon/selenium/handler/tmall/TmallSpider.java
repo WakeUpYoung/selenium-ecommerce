@@ -3,6 +3,8 @@ package cn.wakeupeidolon.selenium.handler.tmall;
 import cn.wakeupeidolon.bean.Commodity;
 import cn.wakeupeidolon.entity.taobao.RateDetail;
 import cn.wakeupeidolon.entity.taobao.RateList;
+import cn.wakeupeidolon.enums.WebType;
+import cn.wakeupeidolon.exceptions.IllegalUrlException;
 import cn.wakeupeidolon.selenium.factory.SeleniumFactory;
 import cn.wakeupeidolon.utils.UrlUtils;
 import com.alibaba.fastjson.JSONObject;
@@ -29,21 +31,32 @@ public class TmallSpider {
      * 获取评论对象集合
      * @param url 商品页面url
      */
-    public static TmallSpider commentSpider(String url) {
+    public static TmallSpider commentSpider(String url) throws IllegalUrlException{
         
         SeleniumFactory seleniumFactory = SeleniumFactory.create(url, false);
         WebDriver driver = seleniumFactory.driver();
         // 登录
         try {
             TmallLogin.login(driver);
-        } catch (IllegalAccessException e) {
+        } catch (IllegalUrlException e) {
+            LOG.error(e.getMessage());
             driver.quit();
         }
-        // 获取基本信息
-        Commodity commodity = TmallCommon.getCommonData(driver);
+        // 获取当前Url
         String currentUrl = driver.getCurrentUrl();
+        Commodity commodity;
+        // 获取基本信息
+        if (TmallLogin.taoBaoOrTmall(currentUrl) == WebType.TMALL.getType()){
+            commodity = TmallCommon.getCommonData(driver);
+        }else if (TmallLogin.taoBaoOrTmall(currentUrl) == WebType.TAO_BAO.getType()){
+            commodity = TaoBaoCommon.getCommonData(driver);
+        }else {
+            throw new IllegalUrlException("Url不是淘宝或天猫链接");
+        }
+        driver.quit();
         String itemId = UrlUtils.getParam(currentUrl, "id");
         List<RateList> rateList = new ArrayList<>();
+        //TODO 当前只爬取了3页，未来将会增加到10页
         for (int i = 1; i <=3; i++){
             RateDetail rateDetail = TmallHttp.get(TmallHttp.createUrl(itemId, i));
             rateDetail.getRateList().stream()

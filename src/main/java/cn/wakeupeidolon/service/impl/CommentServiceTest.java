@@ -12,12 +12,12 @@ import java.util.List;
  * @author Wang Yu
  */
 @Service
-public class CommentServiceImpl implements CommentService {
+public class CommentServiceTest implements CommentService {
     
     private final CommentDao commentDao;
     
     @Autowired
-    public CommentServiceImpl(CommentDao commentDao) {
+    public CommentServiceTest(CommentDao commentDao) {
         this.commentDao = commentDao;
     }
     

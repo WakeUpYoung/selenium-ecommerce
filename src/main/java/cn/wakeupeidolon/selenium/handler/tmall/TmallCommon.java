@@ -1,6 +1,7 @@
 package cn.wakeupeidolon.selenium.handler.tmall;
 
 import cn.wakeupeidolon.bean.Commodity;
+import com.alibaba.fastjson.JSON;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
@@ -12,7 +13,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Date;
 
 /**
- * 获取基础数据包括商品名、评论总数、商品评分
+ * 获取Tmall基础数据包括商品名、评论总数、商品评分
  * @author Wang Yu
  */
 public class TmallCommon {
@@ -34,7 +35,7 @@ public class TmallCommon {
         // 可点击的评论标签
         WebElement reviewsLi = driver.findElement(By.cssSelector("#J_ItemRates"));
         reviewsLi.click();
-        // 滚动脚本
+        
         // 评论总数
         WebElement totalComment = new WebDriverWait(driver, 5)
                 .until((d) -> {
@@ -49,13 +50,13 @@ public class TmallCommon {
                 });
         // 评分
         double rate = Double.valueOf(commodityRate.getText());
-        LOG.info("商品名称:" + goodsNameStr + "," + "评论总数:" + totalCommentStr + "," + "商品评分:" + rate + "," + "type:" + type);
         Commodity commodity = new Commodity();
         commodity.setTotalComment(Integer.valueOf(totalCommentStr));
         commodity.setCommodityName(goodsNameStr);
         commodity.setCommodityRate(rate);
         commodity.setType(type);
         commodity.setCreateDate(new Date());
+        LOG.info("Crawl data : " + JSON.toJSONString(commodity));
         return commodity;
         
     }
