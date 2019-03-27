@@ -13,4 +13,6 @@ public interface CommentService {
     
     Integer batchSave(List<Comment> comments);
     
+    Comment getById(Long id);
+    
 }

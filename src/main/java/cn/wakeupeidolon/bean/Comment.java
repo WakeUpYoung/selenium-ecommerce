@@ -1,7 +1,7 @@
 package cn.wakeupeidolon.bean;
 
-import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.Proxy;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -12,6 +12,7 @@ import java.util.Date;
 @Entity
 @Table(name = "tb_comment")
 @DynamicUpdate
+@Proxy(lazy = false)
 public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

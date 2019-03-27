@@ -12,12 +12,12 @@ import java.util.List;
  * @author Wang Yu
  */
 @Service
-public class CommentServiceTest implements CommentService {
+public class CommentServiceImpl implements CommentService {
     
     private final CommentDao commentDao;
     
     @Autowired
-    public CommentServiceTest(CommentDao commentDao) {
+    public CommentServiceImpl(CommentDao commentDao) {
         this.commentDao = commentDao;
     }
     
@@ -30,5 +30,10 @@ public class CommentServiceTest implements CommentService {
     public Integer batchSave(List<Comment> comments) {
         List<Comment> commentList = commentDao.saveAll(comments);
         return commentList.size();
+    }
+    
+    @Override
+    public Comment getById(Long id) {
+        return commentDao.getOne(id);
     }
 }
