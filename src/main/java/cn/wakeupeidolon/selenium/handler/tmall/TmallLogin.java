@@ -108,6 +108,7 @@ public class TmallLogin {
             objectOutputStream.writeObject(cookies);
             objectOutputStream.flush();
             objectOutputStream.close();
+            LOG.info("Cookies 永久化成功");
         } catch (IOException e) {
             e.printStackTrace();
         }

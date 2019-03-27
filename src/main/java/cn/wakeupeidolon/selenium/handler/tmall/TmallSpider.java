@@ -17,7 +17,7 @@ import java.util.List;
 
 /**
  * @author Wang Yu
- * 对天猫或淘宝网站的评论数据进行爬取
+ * 对天猫或淘宝网站的评论数据进行爬取(主)
  */
 public class TmallSpider {
     
