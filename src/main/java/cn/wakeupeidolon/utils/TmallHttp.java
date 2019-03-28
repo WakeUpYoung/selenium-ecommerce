@@ -1,4 +1,4 @@
-package cn.wakeupeidolon.selenium.handler.tmall;
+package cn.wakeupeidolon.utils;
 
 import cn.wakeupeidolon.entity.taobao.RateDetail;
 import cn.wakeupeidolon.entity.taobao.TaobaoBean;
@@ -36,7 +36,7 @@ public class TmallHttp {
      * @param url 商品页面的url
      * @return {@link RateDetail} 评论详情
      */
-    public static RateDetail get(String url) {
+    public static RateDetail get(String url, Set<org.openqa.selenium.Cookie> cookiesFile) {
         String userAgent = "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36";
     
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
@@ -50,7 +50,6 @@ public class TmallHttp {
                     @Override
                     public List<Cookie> loadForRequest(@Nonnull HttpUrl httpUrl) {
                         LOG.info("使用Cookies请求");
-                        Set<org.openqa.selenium.Cookie> cookiesFile = TmallLogin.getCookiesFromFile();
                         List<Cookie> cookies = new ArrayList<>();
                         if (cookiesFile == null){
                             return null;

@@ -2,8 +2,7 @@ package cn.wakeupeidolon.taobao;
 
 import cn.wakeupeidolon.exceptions.IllegalUrlException;
 import cn.wakeupeidolon.selenium.factory.SeleniumFactory;
-import cn.wakeupeidolon.selenium.handler.tmall.TmallHttp;
-import cn.wakeupeidolon.selenium.handler.tmall.TmallLogin;
+import cn.wakeupeidolon.utils.TmallHttp;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;

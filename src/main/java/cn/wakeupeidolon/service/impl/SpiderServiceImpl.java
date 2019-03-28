@@ -3,7 +3,8 @@ package cn.wakeupeidolon.service.impl;
 import cn.wakeupeidolon.bean.Comment;
 import cn.wakeupeidolon.bean.Commodity;
 import cn.wakeupeidolon.entity.taobao.RateList;
-import cn.wakeupeidolon.selenium.handler.tmall.TmallSpider;
+import cn.wakeupeidolon.selenium.handler.CrawlData;
+import cn.wakeupeidolon.selenium.handler.CrawlHandler;
 import cn.wakeupeidolon.service.CommentService;
 import cn.wakeupeidolon.service.CommodityService;
 import cn.wakeupeidolon.service.SpiderService;
@@ -39,21 +40,22 @@ public class SpiderServiceImpl implements SpiderService {
      */
     @Override
     @Transactional
-    public Integer spiderTmall(String url) {
-        TmallSpider spider = TmallSpider.commentSpider(url);
-        Commodity commodity = spider.getCommodity();
-        List<RateList> rateList = spider.getRateList();
-        List<Comment> commentList = new ArrayList<>();
-        Commodity save = commodityService.save(commodity);
-        rateList.forEach(rate -> {
-            Comment comment = new Comment();
-            comment.setPremiereComment(rate.getRateContent());
-            comment.setAppendComment(rate.getAppendComment());
+    public Integer spider(String url, CrawlHandler handler) {
+        // 登录
+        handler.login();
+        // 爬取基础数据
+        handler.crawlCommodity();
+        // 爬取评论
+        handler.crawlComments();
+        // 获取包装数据
+        CrawlData crawlData = handler.getCrawlData();
+        Commodity save = commodityService.save(crawlData.getCommodity());
+        List<Comment> commentList = crawlData.getCommentList();
+        commentList.forEach(comment -> {
             comment.setCommodityId(save.getId());
             comment.setCreateDate(new Date());
             comment.setBelievable(0);
             comment.setFake(0);
-            commentList.add(comment);
         });
     
         return commentService.batchSave(commentList);
