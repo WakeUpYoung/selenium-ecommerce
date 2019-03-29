@@ -20,6 +20,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 /**
  * @author Wang Yu
  */
@@ -57,6 +59,12 @@ public class SpiderController {
         doneVO.setTaking(taking);
         LOG.info("爬取成功: 耗时 : " + taking/1000.0 + "s, 共爬取" + doneVO.getCount() + "条结果");
         return Result.success(doneVO);
+    }
+    
+    @PostMapping("/crawlAll")
+    @ApiOperation("对列表所有url进行爬取")
+    public Result<List<CrawlDoneVO>> crawlAll(@RequestBody @Validated List<CrawlUrlVO> voList){
+        return null;
     }
     
 }

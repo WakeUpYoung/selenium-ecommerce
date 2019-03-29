@@ -2,6 +2,7 @@ package cn.wakeupeidolon.selenium.handler;
 
 import cn.wakeupeidolon.bean.Commodity;
 import cn.wakeupeidolon.exceptions.CannotLoginException;
+import cn.wakeupeidolon.exceptions.TotalCommentException;
 import org.openqa.selenium.WebDriver;
 
 /**
@@ -11,9 +12,11 @@ import org.openqa.selenium.WebDriver;
 public interface CrawlHandler {
     boolean login() throws CannotLoginException;
     
-    void crawlCommodity();
+    void crawlCommodity() throws TotalCommentException;
     
     void crawlComments();
+    
+    void closeWindows();
     
     CrawlData getCrawlData();
 }

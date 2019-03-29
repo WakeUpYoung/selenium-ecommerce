@@ -44,6 +44,8 @@ public class SpiderServiceImpl implements SpiderService {
         handler.login();
         // 爬取基础数据
         handler.crawlCommodity();
+        // 关闭谷歌webdriver
+        handler.closeWindows();
         // 爬取评论
         handler.crawlComments();
         // 获取包装数据

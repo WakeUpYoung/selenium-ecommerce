@@ -6,6 +6,7 @@ import cn.wakeupeidolon.entity.taobao.RateDetail;
 import cn.wakeupeidolon.enums.WebType;
 import cn.wakeupeidolon.exceptions.CannotLoginException;
 import cn.wakeupeidolon.exceptions.IllegalUrlException;
+import cn.wakeupeidolon.exceptions.TotalCommentException;
 import cn.wakeupeidolon.selenium.handler.CrawlData;
 import cn.wakeupeidolon.selenium.handler.CrawlHandler;
 import cn.wakeupeidolon.utils.CookiesUtils;
@@ -93,7 +94,7 @@ public class TmallCrawlHandler implements CrawlHandler {
     }
     
     @Override
-    public void crawlCommodity() {
+    public void crawlCommodity() throws TotalCommentException{
         WebElement goodsName;
         try{
             goodsName = driver.findElement(By.cssSelector("#J_DetailMeta > div.tm-clear > div.tb-property > div > div.tb-detail-hd > h1 > a"));
@@ -116,6 +117,11 @@ public class TmallCrawlHandler implements CrawlHandler {
                 });
         // 总评论数
         String totalCommentStr = totalComment.getText();
+        Integer totalCount = Integer.valueOf(totalCommentStr);
+        if (totalCount <= 200){
+            throw new TotalCommentException("商品评论数小于200");
+        }
+    
         // 商品评分
         WebElement commodityRate = new WebDriverWait(driver, 15)
                 .until((d) -> {
@@ -124,14 +130,13 @@ public class TmallCrawlHandler implements CrawlHandler {
         // 评分
         double rate = Double.valueOf(commodityRate.getText());
         Commodity commodity = new Commodity();
-        commodity.setTotalComment(Integer.valueOf(totalCommentStr));
+        commodity.setTotalComment(totalCount);
         commodity.setCommodityName(goodsNameStr);
         commodity.setCommodityRate(rate);
         commodity.setType(type);
         commodity.setItemId(UrlUtils.getParam(driver.getCurrentUrl(), "id"));
         commodity.setCreateDate(new Date());
         LOG.info("Crawl Tmall data : " + JSON.toJSONString(commodity));
-        driver.quit();
         this.tmallData.setCommodity(commodity);
     }
     
@@ -139,8 +144,14 @@ public class TmallCrawlHandler implements CrawlHandler {
     public void crawlComments() {
         List<Comment> commentList = new ArrayList<>();
         Set<Cookie> cookiesFromFile = CookiesUtils.getCookiesFromFile(SAVE_COOKIES);
-        //TODO 当前只爬取了3页，未来将会增加到10页
-        for (int i = 1; i <=3; i++){
+        int totalComment = tmallData.getCommodity().getTotalComment();
+        int crawlPage;
+        if (totalComment > 500){
+            crawlPage = 25;
+        }else {
+            crawlPage = (int)Math.ceil(totalComment/20.0);
+        }
+        for (int i = 1; i <=crawlPage; i++){
             RateDetail rateDetail = TmallHttp.get(TmallHttp.createUrl(tmallData.getCommodity().getItemId(), i), cookiesFromFile);
             rateDetail.getRateList().stream()
                     .filter(rate -> {
@@ -161,5 +172,10 @@ public class TmallCrawlHandler implements CrawlHandler {
     @Override
     public CrawlData getCrawlData() {
         return this.tmallData;
+    }
+    
+    @Override
+    public void closeWindows() {
+        driver.quit();
     }
 }

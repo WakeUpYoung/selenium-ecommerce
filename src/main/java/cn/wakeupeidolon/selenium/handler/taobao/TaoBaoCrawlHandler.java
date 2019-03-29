@@ -6,6 +6,7 @@ import cn.wakeupeidolon.entity.taobao.RateDetail;
 import cn.wakeupeidolon.enums.WebType;
 import cn.wakeupeidolon.exceptions.CannotLoginException;
 import cn.wakeupeidolon.exceptions.IllegalUrlException;
+import cn.wakeupeidolon.exceptions.TotalCommentException;
 import cn.wakeupeidolon.selenium.handler.CrawlData;
 import cn.wakeupeidolon.selenium.handler.CrawlHandler;
 import cn.wakeupeidolon.utils.TmallHttp;
@@ -98,7 +99,12 @@ public class TaoBaoCrawlHandler implements CrawlHandler {
     }
     
     @Override
-    public void crawlCommodity() {
+    public void closeWindows() {
+        driver.quit();
+    }
+    
+    @Override
+    public void crawlCommodity() throws TotalCommentException{
         WebElement goodsName;
         goodsName = driver.findElement(By.cssSelector("#J_Title > h3"));
         int type = UrlUtils.checkWebType(driver.getCurrentUrl());
@@ -125,6 +131,10 @@ public class TaoBaoCrawlHandler implements CrawlHandler {
                 });
         // 总评论数
         String totalCommentStr = totalComment.getText();
+        Integer totalCount = Integer.valueOf(totalCommentStr);
+        if (totalCount <= 200){
+            throw new TotalCommentException("商品评论数小于200");
+        }
         WebElement favourCountElement = new WebDriverWait(driver, 5)
                 .until(d -> {
                     WebElement favouriteUl = d.findElement(By.cssSelector("#reviews > div > div > div > div > div > div.tb-revhd > div > ul"));
@@ -143,14 +153,13 @@ public class TaoBaoCrawlHandler implements CrawlHandler {
         }
     
         Commodity commodity = new Commodity();
-        commodity.setTotalComment(Integer.valueOf(totalCommentStr));
+        commodity.setTotalComment(totalCount);
         commodity.setCommodityName(goodsNameStr);
         commodity.setFavorableRate(favorableRate);
         commodity.setItemId(UrlUtils.getParam(driver.getCurrentUrl(), "id"));
         commodity.setType(type);
         commodity.setCreateDate(new Date());
         LOG.info("Crawl Tao Bao data : " + JSON.toJSONString(commodity));
-        driver.quit();
         taoBaoCrawlData.setCommodity(commodity);
     }
     
@@ -158,8 +167,14 @@ public class TaoBaoCrawlHandler implements CrawlHandler {
     public void crawlComments() {
         List<Comment> commentList = new ArrayList<>();
         Set<Cookie> cookiesFromFile = CookiesUtils.getCookiesFromFile(SAVE_COOKIES);
-        //TODO 当前只爬取了3页，未来将会增加到10页
-        for (int i = 1; i <=3; i++){
+        Integer totalComment = taoBaoCrawlData.getCommodity().getTotalComment();
+        int crawlPage;
+        if (totalComment > 500){
+            crawlPage = 25;
+        }else {
+            crawlPage = (int)Math.ceil(totalComment/20.0);
+        }
+        for (int i = 1; i <=crawlPage; i++){
             RateDetail rateDetail = TmallHttp.get(TmallHttp.createUrl(taoBaoCrawlData.getCommodity().getItemId(), i), cookiesFromFile);
             rateDetail.getRateList().stream()
                     .filter(rate -> {
