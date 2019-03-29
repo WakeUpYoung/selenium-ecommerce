@@ -3,7 +3,6 @@ package cn.wakeupeidolon.selenium.handler.tmall;
 import cn.wakeupeidolon.bean.Comment;
 import cn.wakeupeidolon.bean.Commodity;
 import cn.wakeupeidolon.entity.taobao.RateDetail;
-import cn.wakeupeidolon.entity.taobao.RateList;
 import cn.wakeupeidolon.enums.WebType;
 import cn.wakeupeidolon.exceptions.CannotLoginException;
 import cn.wakeupeidolon.exceptions.IllegalUrlException;
@@ -57,7 +56,8 @@ public class TmallCrawlHandler implements CrawlHandler {
                 driver.manage().addCookie(cookie);
             }
             try {
-                Thread.sleep(5000);
+                LOG.info("等待Cookies载入");
+                Thread.sleep(15000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -128,20 +128,20 @@ public class TmallCrawlHandler implements CrawlHandler {
         commodity.setCommodityName(goodsNameStr);
         commodity.setCommodityRate(rate);
         commodity.setType(type);
+        commodity.setItemId(UrlUtils.getParam(driver.getCurrentUrl(), "id"));
         commodity.setCreateDate(new Date());
         LOG.info("Crawl Tmall data : " + JSON.toJSONString(commodity));
+        driver.quit();
         this.tmallData.setCommodity(commodity);
     }
     
     @Override
     public void crawlComments() {
-        String itemId = UrlUtils.getParam(driver.getCurrentUrl(), "id");
-        driver.quit();
         List<Comment> commentList = new ArrayList<>();
         Set<Cookie> cookiesFromFile = CookiesUtils.getCookiesFromFile(SAVE_COOKIES);
         //TODO 当前只爬取了3页，未来将会增加到10页
         for (int i = 1; i <=3; i++){
-            RateDetail rateDetail = TmallHttp.get(TmallHttp.createUrl(itemId, i), cookiesFromFile);
+            RateDetail rateDetail = TmallHttp.get(TmallHttp.createUrl(tmallData.getCommodity().getItemId(), i), cookiesFromFile);
             rateDetail.getRateList().stream()
                     .filter(rate -> {
                         return !TmallCrawlHandler.EMPTY_COMMENT.equals(rate.getRateContent());

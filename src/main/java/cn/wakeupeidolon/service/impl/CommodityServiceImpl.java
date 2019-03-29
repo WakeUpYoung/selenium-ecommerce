@@ -32,4 +32,9 @@ public class CommodityServiceImpl implements CommodityService {
         return commodities.size();
     }
     
+    @Override
+    public Boolean hasRepeat(String itemId, int type) {
+        Integer count = commodityDao.countByItemIdAndType(itemId, type);
+        return count > 0;
+    }
 }

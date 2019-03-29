@@ -7,5 +7,5 @@ import cn.wakeupeidolon.selenium.handler.CrawlHandler;
  * 爬取数据Service
  */
 public interface SpiderService {
-    Integer spider(String url, CrawlHandler handler);
+    Integer spider(CrawlHandler handler);
 }

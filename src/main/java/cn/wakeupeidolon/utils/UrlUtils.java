@@ -1,7 +1,6 @@
 package cn.wakeupeidolon.utils;
 
 import cn.wakeupeidolon.enums.WebType;
-import org.openqa.selenium.WebDriver;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -16,11 +15,11 @@ public class UrlUtils {
     }
     
     public static String getParam(String url, String key){
-        Pattern pattern = Pattern.compile("(^|&)" + key + "=([^&]*)(&|$)");
+        Pattern pattern = Pattern.compile("(^|&|\\?)" + key + "=([^&]*)(&|$)");
         Matcher matcher = pattern.matcher(url);
         if (matcher.find()){
             String result = matcher.group();
-            return result.replaceAll("[&=" + key + "]", "");
+            return result.replaceAll("[?&=" + key + "]", "");
         }
         return null;
     }

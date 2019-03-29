@@ -6,6 +6,7 @@ package cn.wakeupeidolon.enums;
 public enum  ErrorCode {
     
     SUCCESS(0, "success"),
+    ITEM_REPEAT(-501, "数据库中已有该商品"),
     UNKNOWN_ERROR(-1, "未知错误")
     
     ;

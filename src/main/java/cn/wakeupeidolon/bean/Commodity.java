@@ -34,6 +34,9 @@ public class Commodity {
     @Column(name = "type")
     private Integer type;
     
+    @Column(name = "item_id")
+    private String itemId;
+    
     @Column(name = "create_date")
     private Date createDate;
     
@@ -86,6 +89,14 @@ public class Commodity {
     
     public void setType(Integer type) {
         this.type = type;
+    }
+    
+    public String getItemId() {
+        return itemId;
+    }
+    
+    public void setItemId(String itemId) {
+        this.itemId = itemId;
     }
     
     public Date getCreateDate() {

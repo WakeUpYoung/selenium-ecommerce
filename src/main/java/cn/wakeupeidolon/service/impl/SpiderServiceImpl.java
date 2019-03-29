@@ -35,12 +35,11 @@ public class SpiderServiceImpl implements SpiderService {
     
     /**
      * 对天猫或淘宝进行爬取，并保存数据库
-     * @param url 商品所在链接
      * @return 总共爬取的评论数
      */
     @Override
     @Transactional
-    public Integer spider(String url, CrawlHandler handler) {
+    public Integer spider(CrawlHandler handler) {
         // 登录
         handler.login();
         // 爬取基础数据

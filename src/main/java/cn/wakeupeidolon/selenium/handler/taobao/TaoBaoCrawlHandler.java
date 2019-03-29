@@ -3,7 +3,6 @@ package cn.wakeupeidolon.selenium.handler.taobao;
 import cn.wakeupeidolon.bean.Comment;
 import cn.wakeupeidolon.bean.Commodity;
 import cn.wakeupeidolon.entity.taobao.RateDetail;
-import cn.wakeupeidolon.entity.taobao.RateList;
 import cn.wakeupeidolon.enums.WebType;
 import cn.wakeupeidolon.exceptions.CannotLoginException;
 import cn.wakeupeidolon.exceptions.IllegalUrlException;
@@ -62,7 +61,8 @@ public class TaoBaoCrawlHandler implements CrawlHandler {
                 driver.manage().addCookie(cookie);
             }
             try {
-                Thread.sleep(5000);
+                LOG.info("等待Cookies载入");
+                Thread.sleep(15000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -108,7 +108,10 @@ public class TaoBaoCrawlHandler implements CrawlHandler {
         String goodsNameStr = goodsName.getText();
     
         // 评论标签所在ul
-        WebElement reviewUl = driver.findElement(By.cssSelector("#J_TabBar"));
+        WebElement reviewUl = new WebDriverWait(driver, 5)
+                .until(d -> {
+                    return driver.findElement(By.cssSelector("#J_TabBar"));
+                });
         // 滚动到评论所在列
         ((JavascriptExecutor) driver).executeScript(scrollScript, reviewUl);
     
@@ -124,8 +127,8 @@ public class TaoBaoCrawlHandler implements CrawlHandler {
         String totalCommentStr = totalComment.getText();
         WebElement favourCountElement = new WebDriverWait(driver, 5)
                 .until(d -> {
-                    return d.findElement(By.cssSelector("#reviews > div > div > div > div > div " +
-                            "> div.tb-revhd > div.kg-rate-wd-filter-bar > ul > li:nth-child(4) > label > span > span.content-regarded"));
+                    WebElement favouriteUl = d.findElement(By.cssSelector("#reviews > div > div > div > div > div > div.tb-revhd > div > ul"));
+                    return favouriteUl.findElement(By.xpath("//span[@data-kg-rate-stats='good']"));
                 });
         String favourCountStr = favourCountElement.getText();
         double favorableRate = -1.0;
@@ -143,21 +146,21 @@ public class TaoBaoCrawlHandler implements CrawlHandler {
         commodity.setTotalComment(Integer.valueOf(totalCommentStr));
         commodity.setCommodityName(goodsNameStr);
         commodity.setFavorableRate(favorableRate);
+        commodity.setItemId(UrlUtils.getParam(driver.getCurrentUrl(), "id"));
         commodity.setType(type);
         commodity.setCreateDate(new Date());
         LOG.info("Crawl Tao Bao data : " + JSON.toJSONString(commodity));
+        driver.quit();
         taoBaoCrawlData.setCommodity(commodity);
     }
     
     @Override
     public void crawlComments() {
-        String itemId = UrlUtils.getParam(driver.getCurrentUrl(), "id");
-        driver.quit();
         List<Comment> commentList = new ArrayList<>();
         Set<Cookie> cookiesFromFile = CookiesUtils.getCookiesFromFile(SAVE_COOKIES);
         //TODO 当前只爬取了3页，未来将会增加到10页
         for (int i = 1; i <=3; i++){
-            RateDetail rateDetail = TmallHttp.get(TmallHttp.createUrl(itemId, i), cookiesFromFile);
+            RateDetail rateDetail = TmallHttp.get(TmallHttp.createUrl(taoBaoCrawlData.getCommodity().getItemId(), i), cookiesFromFile);
             rateDetail.getRateList().stream()
                     .filter(rate -> {
                         return !TaoBaoCrawlHandler.EMPTY_COMMENT.equals(rate.getRateContent());
