@@ -2,6 +2,7 @@ package cn.wakeupeidolon.selenium.handler;
 
 import cn.wakeupeidolon.bean.Commodity;
 import cn.wakeupeidolon.exceptions.CannotLoginException;
+import cn.wakeupeidolon.exceptions.HttpAccessPreventException;
 import cn.wakeupeidolon.exceptions.TotalCommentException;
 import org.openqa.selenium.WebDriver;
 
@@ -19,4 +20,6 @@ public interface CrawlHandler {
     void closeWindows();
     
     CrawlData getCrawlData();
+    
+    WebDriver driver();
 }

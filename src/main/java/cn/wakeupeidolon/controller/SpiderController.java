@@ -2,10 +2,12 @@ package cn.wakeupeidolon.controller;
 
 import cn.wakeupeidolon.controller.vo.request.CrawlUrlVO;
 import cn.wakeupeidolon.controller.vo.response.CrawlDoneVO;
+import cn.wakeupeidolon.controller.vo.response.MultiCrawlDoneVO;
 import cn.wakeupeidolon.domain.Result;
 import cn.wakeupeidolon.enums.ErrorCode;
 import cn.wakeupeidolon.selenium.factory.CrawlHandlerFactory;
 import cn.wakeupeidolon.selenium.handler.CrawlHandler;
+import cn.wakeupeidolon.selenium.handler.taobao.TaoBaoCrawlHandler;
 import cn.wakeupeidolon.service.CommodityService;
 import cn.wakeupeidolon.service.SpiderService;
 import cn.wakeupeidolon.utils.UrlUtils;
@@ -21,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author Wang Yu
@@ -49,13 +52,12 @@ public class SpiderController {
         if (commodityService.hasRepeat(itemId, UrlUtils.checkWebType(urlVO.getUrl()))){
             return Result.error(ErrorCode.ITEM_REPEAT);
         }
-        Long start = System.currentTimeMillis();
+        long start = System.currentTimeMillis();
         CrawlHandler crawlHandler = CrawlHandlerFactory.create(urlVO.getUrl());
         Integer spiderCount = spiderService.spider(crawlHandler);
-        Long end = System.currentTimeMillis();
         CrawlDoneVO doneVO = new CrawlDoneVO();
         doneVO.setCount(spiderCount);
-        long taking = end - start;
+        long taking = System.currentTimeMillis() - start;
         doneVO.setTaking(taking);
         LOG.info("爬取成功: 耗时 : " + taking/1000.0 + "s, 共爬取" + doneVO.getCount() + "条结果");
         return Result.success(doneVO);
@@ -63,8 +65,19 @@ public class SpiderController {
     
     @PostMapping("/crawlAll")
     @ApiOperation("对列表所有url进行爬取")
-    public Result<List<CrawlDoneVO>> crawlAll(@RequestBody @Validated List<CrawlUrlVO> voList){
-        return null;
+    public Result<MultiCrawlDoneVO> crawlAll(@RequestBody @Validated List<CrawlUrlVO> voList){
+        long start = System.currentTimeMillis();
+        CrawlHandler crawlHandler = CrawlHandlerFactory.create(voList.get(0).getUrl());
+        MultiCrawlDoneVO doneVO = new MultiCrawlDoneVO();
+        Integer result = spiderService.crawlAll(crawlHandler,
+                        voList.stream().map(CrawlUrlVO::getUrl).collect(Collectors.toList()));
+        long taking = System.currentTimeMillis() - start;
+        doneVO.setSuccess(result);
+        doneVO.setTotal(voList.size());
+        doneVO.setTaking(taking);
+        doneVO.setFail(voList.size() - result);
+        LOG.info("爬取成功: 耗时 : " + taking/1000.0 + "s, 共成功爬取" + doneVO.getSuccess() + "条结果");
+        return Result.success(doneVO);
     }
     
 }

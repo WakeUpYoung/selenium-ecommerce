@@ -5,6 +5,7 @@ import cn.wakeupeidolon.bean.Commodity;
 import cn.wakeupeidolon.entity.taobao.RateDetail;
 import cn.wakeupeidolon.enums.WebType;
 import cn.wakeupeidolon.exceptions.CannotLoginException;
+import cn.wakeupeidolon.exceptions.HttpAccessPreventException;
 import cn.wakeupeidolon.exceptions.IllegalUrlException;
 import cn.wakeupeidolon.exceptions.TotalCommentException;
 import cn.wakeupeidolon.selenium.handler.CrawlData;
@@ -170,24 +171,30 @@ public class TaoBaoCrawlHandler implements CrawlHandler {
         Integer totalComment = taoBaoCrawlData.getCommodity().getTotalComment();
         int crawlPage;
         if (totalComment > 500){
-            crawlPage = 25;
+            crawlPage = 15;
         }else {
             crawlPage = (int)Math.ceil(totalComment/20.0);
         }
         for (int i = 1; i <=crawlPage; i++){
-            RateDetail rateDetail = TmallHttp.get(TmallHttp.createUrl(taoBaoCrawlData.getCommodity().getItemId(), i), cookiesFromFile);
-            rateDetail.getRateList().stream()
-                    .filter(rate -> {
-                        return !TaoBaoCrawlHandler.EMPTY_COMMENT.equals(rate.getRateContent());
-                    })
-                    .forEach(rate -> {
-                        Comment comment = new Comment();
-                        comment.setPremiereComment(rate.getRateContent());
-                        if (rate.getAppendComment() != null && !rate.getAppendComment().equals("")){
-                            comment.setAppendComment(JSONObject.parseObject(rate.getAppendComment()).getString("content"));
-                        }
-                        commentList.add(comment);
-                    });
+            try{
+                RateDetail rateDetail = TmallHttp.get(TmallHttp.createUrl(taoBaoCrawlData.getCommodity().getItemId(), i), cookiesFromFile);
+                rateDetail.getRateList().stream()
+                        .filter(rate -> {
+                            return !TaoBaoCrawlHandler.EMPTY_COMMENT.equals(rate.getRateContent());
+                        })
+                        .forEach(rate -> {
+                            Comment comment = new Comment();
+                            comment.setPremiereComment(rate.getRateContent());
+                            if (rate.getAppendComment() != null && !rate.getAppendComment().equals("")){
+                                comment.setAppendComment(JSONObject.parseObject(rate.getAppendComment()).getString("content"));
+                            }
+                            commentList.add(comment);
+                        });
+    
+            }catch (HttpAccessPreventException e){
+                LOG.error(e.getMessage());
+                break;
+            }
         }
         this.taoBaoCrawlData.setCommentList(commentList);
     }
@@ -195,5 +202,10 @@ public class TaoBaoCrawlHandler implements CrawlHandler {
     @Override
     public CrawlData getCrawlData() {
         return this.taoBaoCrawlData;
+    }
+    
+    @Override
+    public WebDriver driver() {
+        return this.driver;
     }
 }

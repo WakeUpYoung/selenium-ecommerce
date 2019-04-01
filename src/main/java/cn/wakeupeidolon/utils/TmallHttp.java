@@ -2,6 +2,7 @@ package cn.wakeupeidolon.utils;
 
 import cn.wakeupeidolon.entity.taobao.RateDetail;
 import cn.wakeupeidolon.entity.taobao.TaobaoBean;
+import cn.wakeupeidolon.exceptions.HttpAccessPreventException;
 import com.alibaba.fastjson.JSONObject;
 import okhttp3.*;
 import org.slf4j.Logger;
@@ -36,7 +37,7 @@ public class TmallHttp {
      * @param url 商品页面的url
      * @return {@link RateDetail} 评论详情
      */
-    public static RateDetail get(String url, Set<org.openqa.selenium.Cookie> cookiesFile) {
+    public static RateDetail get(String url, Set<org.openqa.selenium.Cookie> cookiesFile) throws HttpAccessPreventException {
         String userAgent = "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36";
     
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
@@ -90,7 +91,12 @@ public class TmallHttp {
             e.printStackTrace();
         }
         String bodyReqStr = stringBuilder.toString();
-        String jsonStr = bodyReqStr.substring(bodyReqStr.indexOf("(") + 1, bodyReqStr.lastIndexOf(")"));
+        String jsonStr = "";
+        try{
+            jsonStr = bodyReqStr.substring(bodyReqStr.indexOf("(") + 1, bodyReqStr.lastIndexOf(")"));
+        }catch (StringIndexOutOfBoundsException e){
+            throw new HttpAccessPreventException("Http爬取被禁止");
+        }
         TaobaoBean taobaoBean = JSONObject.parseObject(jsonStr, TaobaoBean.class);
         return taobaoBean.getRateDetail();
         

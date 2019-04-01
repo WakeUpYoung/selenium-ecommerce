@@ -5,6 +5,7 @@ import cn.wakeupeidolon.bean.Commodity;
 import cn.wakeupeidolon.entity.taobao.RateDetail;
 import cn.wakeupeidolon.enums.WebType;
 import cn.wakeupeidolon.exceptions.CannotLoginException;
+import cn.wakeupeidolon.exceptions.HttpAccessPreventException;
 import cn.wakeupeidolon.exceptions.IllegalUrlException;
 import cn.wakeupeidolon.exceptions.TotalCommentException;
 import cn.wakeupeidolon.selenium.handler.CrawlData;
@@ -141,30 +142,36 @@ public class TmallCrawlHandler implements CrawlHandler {
     }
     
     @Override
-    public void crawlComments() {
+    public void crawlComments(){
         List<Comment> commentList = new ArrayList<>();
         Set<Cookie> cookiesFromFile = CookiesUtils.getCookiesFromFile(SAVE_COOKIES);
         int totalComment = tmallData.getCommodity().getTotalComment();
         int crawlPage;
         if (totalComment > 500){
-            crawlPage = 25;
+            crawlPage = 15;
         }else {
             crawlPage = (int)Math.ceil(totalComment/20.0);
         }
         for (int i = 1; i <=crawlPage; i++){
-            RateDetail rateDetail = TmallHttp.get(TmallHttp.createUrl(tmallData.getCommodity().getItemId(), i), cookiesFromFile);
-            rateDetail.getRateList().stream()
-                    .filter(rate -> {
-                        return !TmallCrawlHandler.EMPTY_COMMENT.equals(rate.getRateContent());
-                    })
-                    .forEach(rate -> {
-                        Comment comment = new Comment();
-                        comment.setPremiereComment(rate.getRateContent());
-                        if (rate.getAppendComment() != null && !rate.getAppendComment().equals("")){
-                            comment.setAppendComment(JSONObject.parseObject(rate.getAppendComment()).getString("content"));
-                        }
-                        commentList.add(comment);
-                    });
+            try{
+                RateDetail rateDetail = TmallHttp.get(TmallHttp.createUrl(tmallData.getCommodity().getItemId(), i), cookiesFromFile);
+                rateDetail.getRateList().stream()
+                        .filter(rate -> {
+                            return !TmallCrawlHandler.EMPTY_COMMENT.equals(rate.getRateContent());
+                        })
+                        .forEach(rate -> {
+                            Comment comment = new Comment();
+                            comment.setPremiereComment(rate.getRateContent());
+                            if (rate.getAppendComment() != null && !rate.getAppendComment().equals("")){
+                                comment.setAppendComment(JSONObject.parseObject(rate.getAppendComment()).getString("content"));
+                            }
+                            commentList.add(comment);
+                        });
+    
+            }catch (HttpAccessPreventException e){
+                LOG.error(e.getMessage());
+                break;
+            }
         }
         this.tmallData.setCommentList(commentList);
     }
@@ -177,5 +184,10 @@ public class TmallCrawlHandler implements CrawlHandler {
     @Override
     public void closeWindows() {
         driver.quit();
+    }
+    
+    @Override
+    public WebDriver driver() {
+        return this.driver;
     }
 }
