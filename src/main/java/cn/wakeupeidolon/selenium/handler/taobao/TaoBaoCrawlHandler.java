@@ -175,7 +175,7 @@ public class TaoBaoCrawlHandler implements CrawlHandler {
         }else {
             crawlPage = (int)Math.ceil(totalComment/20.0);
         }
-        for (int i = 1; i <=crawlPage; i++){
+        for (int i = 1; i <= crawlPage; i++){
             try{
                 RateDetail rateDetail = TmallHttp.get(TmallHttp.createUrl(taoBaoCrawlData.getCommodity().getItemId(), i), cookiesFromFile);
                 rateDetail.getRateList().stream()
