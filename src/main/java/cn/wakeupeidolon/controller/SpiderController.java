@@ -76,7 +76,7 @@ public class SpiderController {
         doneVO.setTotal(voList.size());
         doneVO.setTaking(taking);
         doneVO.setFail(voList.size() - result);
-        LOG.info("爬取成功: 耗时 : " + taking/1000.0 + "s, 共成功爬取" + doneVO.getSuccess() + "条结果");
+        LOG.info("爬取成功: 耗时 : " + taking/1000.0 + "s, 共成功爬取" + doneVO.getSuccess() + "个商品");
         return Result.success(doneVO);
     }
     

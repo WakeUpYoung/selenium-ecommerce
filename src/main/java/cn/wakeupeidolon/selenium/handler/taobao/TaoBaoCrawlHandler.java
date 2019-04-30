@@ -64,7 +64,7 @@ public class TaoBaoCrawlHandler implements CrawlHandler {
             }
             try {
                 LOG.info("等待Cookies载入");
-                Thread.sleep(15000);
+                Thread.sleep(5000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -72,7 +72,7 @@ public class TaoBaoCrawlHandler implements CrawlHandler {
         }
         try{
             // 等待登录成功
-            WebElement userName = new WebDriverWait(driver, 30)
+            WebElement userName = new WebDriverWait(driver, 10)
                     .until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(userNameTag)));
             if (userName.getText() == null || userName.getText().equals("")){
                 throw new CannotLoginException("登录未成功");

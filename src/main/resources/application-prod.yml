@@ -1,11 +1,11 @@
 server:
-  port: 8094
+  port: 8083
 
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/db_taobao_comment?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai&useSSL=false
+    url: jdbc:mysql://39.108.74.47:3306/db_comment_label?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai&useSSL=false
     username: root
-    password: 123456
+    password: Wang123
 
   jpa:
     show-sql: true
