@@ -126,7 +126,7 @@ public class TmallCrawlHandler implements CrawlHandler {
         // 商品评分
         WebElement commodityRate = new WebDriverWait(driver, 15)
                 .until((d) -> {
-                    return d.findElement(By.cssSelector("#J_Reviews > div > div.rate-header.rate-header-tags > div.rate-score > strong"));
+                    return d.findElement(By.cssSelector("#J_Reviews > div > div.rate-header > div.rate-score > strong"));
                 });
         // 评分
         double rate = Double.valueOf(commodityRate.getText());
